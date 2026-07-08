@@ -1294,71 +1294,125 @@ function publishToPublic() {
 function doPublish(tpl) {
   showDialog(`<div style="text-align:center;padding:24px 8px">
     <div style="font-size:32px;margin-bottom:8px">⏳</div>
-    <div style="color:var(--ink-1);font-size:14px">正在生成你的个人网站并发布到公网...</div>
-    <div style="color:var(--ink-2);font-size:12px;margin-top:6px">通常 1-3 秒</div>
+    <div style="color:var(--ink-1);font-size:14px">正在生成你的个人网站…</div>
+    <div style="color:var(--ink-2);font-size:12px;margin-top:6px">通常 1-2 秒</div>
   </div>`);
   // 第一步:在浏览器里生成完整 HTML 字符串
   const html = buildStandaloneSite(profile, records, tpl);
-  // 第二步:POST 到本地 publish_server(由 cloudflared 暴露到公网)
-  fetch("http://127.0.0.1:9876/publish", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ html, name: profile.pName || "portfolio", tpl })
-  })
-  .then(r => r.json().then(j => ({ status: r.status, body: j })))
-  .then(({ status, body }) => {
-    if (status !== 200 || !body.ok) {
-      throw new Error(body && body.message ? body.message : ("HTTP " + status));
-    }
-    const url = body.publicUrl;
-    const fname = body.filename;
-    showDialog(`
-      <div style="text-align:center;padding:8px 0">
-        <div style="font-size:32px;margin-bottom:6px">🎉</div>
-        <div style="font-size:15px;font-weight:600;margin-bottom:4px">发布成功!</div>
-        <div style="font-size:12px;color:var(--ink-2);margin-bottom:18px">文件:<code>${escape(fname)}</code> · ${(body.size/1024).toFixed(1)} KB</div>
+  const fname = (profile.pName || "portfolio").replace(/\s+/g, "_") + "_" + tpl + ".html";
 
-        <div style="background:var(--bg-2);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:14px 0;text-align:left">
-          <div style="font-size:11px;color:var(--ink-2);margin-bottom:6px;letter-spacing:.04em">公网链接(任何设备可直接打开)</div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input id="publicUrlInput" readonly value="${escape(url)}" style="flex:1;border:1px solid var(--line);padding:8px 10px;border-radius:6px;font-size:12px;font-family:ui-monospace,Consolas,monospace;background:#fff">
-            <button class="primary" id="copyUrlBtn" style="white-space:nowrap">复制</button>
-          </div>
+  // 第二步:尝试本地 publish_server(开发者本机模式,直接拿到公网链接)
+  const useLocal = /localhost|127\.0\.0\.1/i.test(location.hostname);
+  if (useLocal) {
+    fetch("http://127.0.0.1:9876/publish", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ html, name: profile.pName || "portfolio", tpl })
+    })
+    .then(r => r.json().then(j => ({ status: r.status, body: j })))
+    .then(({ status, body }) => {
+      if (status !== 200 || !body.ok) throw new Error(body && body.message ? body.message : ("HTTP " + status));
+      const url = body.publicUrl;
+      showPublishSuccessDialog(url, body.filename || fname, body.size || html.length, html, tpl);
+    })
+    .catch(err => {
+      // 本地模式失败也回退到下载
+      showPublishDownloadDialog(html, fname, err.message);
+    });
+  } else {
+    // 公网用户模式:直接下载 HTML + 引导用户部署
+    showPublishDownloadDialog(html, fname, null);
+  }
+}
+
+// 开发者本机:直接显示公网链接 + 二维码
+function showPublishSuccessDialog(url, fname, size, html, tpl) {
+  showDialog(`
+    <div style="text-align:center;padding:8px 0">
+      <div style="font-size:32px;margin-bottom:6px">🎉</div>
+      <div style="font-size:15px;font-weight:600;margin-bottom:4px">发布成功!</div>
+      <div style="font-size:12px;color:var(--ink-2);margin-bottom:18px">文件:<code>${escape(fname)}</code> · ${(size/1024).toFixed(1)} KB</div>
+
+      <div style="background:var(--bg-2);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:14px 0;text-align:left">
+        <div style="font-size:11px;color:var(--ink-2);margin-bottom:6px;letter-spacing:.04em">公网链接(任何设备可直接打开)</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="publicUrlInput" readonly value="${escape(url)}" style="flex:1;border:1px solid var(--line);padding:8px 10px;border-radius:6px;font-size:12px;font-family:ui-monospace,Consolas,monospace;background:#fff">
+          <button class="primary" id="copyUrlBtn" style="white-space:nowrap">复制</button>
         </div>
-
-        <div style="background:var(--bg-2);border:1px solid var(--line);border-radius:8px;padding:12px;margin:8px 0 16px">
-          <div style="font-size:11px;color:var(--ink-2);margin-bottom:6px;letter-spacing:.04em">二维码(扫码打开)</div>
-          <img alt="qrcode" src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(url)}" style="width:160px;height:160px;border-radius:6px;background:#fff">
-        </div>
-
-        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-          <button onclick="window.open('${escape(url)}','_blank')">↗ 新窗口打开</button>
-          <button class="primary" onclick="document.getElementById('dialog').style.display='none'">完成</button>
-        </div>
-
-        <div style="font-size:11px;color:var(--ink-2);margin-top:16px;line-height:1.6">小提示:链接长期有效,你可以分享到群、贴到简历,或扫一扫让手机看效果。<br>想换风格,改完再点一次"一键发布"即可。</div>
       </div>
-    `);
-    setTimeout(() => {
-      const btn = document.getElementById("copyUrlBtn");
-      const inp = document.getElementById("publicUrlInput");
-      if (btn && inp) {
-        btn.onclick = () => {
-          inp.select();
-          try { navigator.clipboard.writeText(inp.value).then(()=>toast("✓ 已复制")); }
-          catch(_) { document.execCommand("copy"); toast("✓ 已复制"); }
-        };
-      }
-    }, 50);
-  })
-  .catch(err => {
-    showDialog(`<div style="text-align:center;padding:24px 8px">
-      <div style="font-size:32px;margin-bottom:8px;color:#e53935">⚠</div>
-      <div style="font-size:14px;font-weight:600;margin-bottom:6px">发布失败</div>
-      <div style="font-size:12px;color:var(--ink-2);line-height:1.6">${escape(err.message || String(err))}<br><br>可能原因:<br>· 公网通道暂未启动<br>· 浏览器拦截了 127.0.0.1 请求</div>
-      <button class="primary" style="margin-top:16px" onclick="document.getElementById('dialog').style.display='none'">关闭</button>
-    </div>`);
-  });
+
+      <div style="background:var(--bg-2);border:1px solid var(--line);border-radius:8px;padding:12px;margin:8px 0 16px">
+        <div style="font-size:11px;color:var(--ink-2);margin-bottom:6px;letter-spacing:.04em">二维码(扫码打开)</div>
+        <img alt="qrcode" src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(url)}" style="width:160px;height:160px;border-radius:6px;background:#fff">
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button onclick="window.open('${escape(url)}','_blank')">↗ 新窗口打开</button>
+        <button class="primary" onclick="document.getElementById('dialog').style.display='none'">完成</button>
+      </div>
+
+      <div style="font-size:11px;color:var(--ink-2);margin-top:16px;line-height:1.6">小提示:链接长期有效,你可以分享到群、贴到简历,或扫一扫让手机看效果。<br>想换风格,改完再点一次"一键发布"即可。</div>
+    </div>
+  `);
+  setTimeout(() => {
+    const btn = document.getElementById("copyUrlBtn");
+    const inp = document.getElementById("publicUrlInput");
+    if (btn && inp) {
+      btn.onclick = () => {
+        inp.select();
+        try { navigator.clipboard.writeText(inp.value).then(()=>toast("✓ 已复制")); }
+        catch(_) { document.execCommand("copy"); toast("✓ 已复制"); }
+      };
+    }
+  }, 50);
+}
+
+// 公网用户:直接下载 HTML 文件 + 一键部署到 GitHub Gist / 多种托管
+function showPublishDownloadDialog(html, fname, errMsg) {
+  // 把 html 暂存,让用户通过 gist 链接上传
+  // 把 html 用 base64 编码后塞 URL 一次性传给 gist helper
+  const encoded = btoa(unescape(encodeURIComponent(html)));
+  const studioUrl = location.href.split("?")[0];
+  const gistHelperUrl = `https://gist.github.com/?portfolio_html_data=${encoded.slice(0, 200)}`; // 占位,实际不通过 URL 传大数据
+  // 真正的上传通过 GitHub Gist API(需要用户 token),这里给手动指引
+
+  showDialog(`
+    <div style="text-align:center;padding:8px 0">
+      <div style="font-size:32px;margin-bottom:6px">📥</div>
+      <div style="font-size:15px;font-weight:600;margin-bottom:4px">作品集已生成</div>
+      <div style="font-size:12px;color:var(--ink-2);margin-bottom:18px">文件:<code>${escape(fname)}</code> · ${(html.length/1024).toFixed(1)} KB</div>
+
+      <div style="background:var(--bg-2);border:1px solid var(--line);border-radius:8px;padding:14px;margin:14px 0;text-align:left">
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px">📌 三种永久托管方式(选一个)</div>
+        <div style="font-size:12px;color:var(--ink-1);line-height:1.85">
+          <b>① GitHub Pages(免费,推荐):</b>先把下载的 <code>${escape(fname)}</code> 改名为 <code>index.html</code>,然后到 GitHub 新建仓库 → 上传文件 → Settings → Pages → 选 main / root → 1 分钟后得到永久链接。<br>
+          <b>② Netlify Drop(零配置):</b>打开 <a href="https://app.netlify.com/drop" target="_blank" rel="noopener" style="color:var(--brand)">app.netlify.com/drop</a>,把下载的文件拖进去,立即得到 <code>xxx.netlify.app</code> 链接,无需注册。<br>
+          <b>③ Cloudflare Pages:</b>同上,登录后上传即可,得到 <code>xxx.pages.dev</code>。
+        </div>
+      </div>
+
+      ${errMsg ? `
+      <div style="background:#fff8e1;border:1px solid #f0c674;border-radius:8px;padding:10px 12px;margin:10px 0;font-size:12px;color:#7a5206;text-align:left">
+        ⚠ 本地通道不可用(<code>${escape(errMsg)}</code>),改用上述任一方式即可永久访问。
+      </div>
+      ` : ""}
+
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px">
+        <button class="primary" id="dlSiteBtn">⬇ 下载 HTML 文件</button>
+        <button onclick="window.open('https://app.netlify.com/drop','_blank')">↗ Netlify 部署</button>
+        <button onclick="document.getElementById('dialog').style.display='none'">关闭</button>
+      </div>
+
+      <div style="font-size:11px;color:var(--ink-2);margin-top:14px;line-height:1.6">💡 小提示:HTML 文件完全独立,不依赖任何服务器;想发给别人看直接传文件 / 拖到 Netlify / 上传 GitHub 都行。</div>
+    </div>
+  `);
+  setTimeout(() => {
+    const dlBtn = document.getElementById("dlSiteBtn");
+    if (dlBtn) dlBtn.onclick = () => {
+      blobDownload(html, fname);
+      toast("✓ 已下载 " + fname);
+    };
+  }, 50);
 }
 
 /* ---------------- 选版式 modal(三种设计风格) ---------------- */
