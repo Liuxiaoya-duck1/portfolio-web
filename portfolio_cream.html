@@ -1,0 +1,336 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>李华 · 产品工程师</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+html,body{min-height:100%}
+body{padding:80px 28px 80px;max-width:680px;margin:0 auto;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.s1-hero{}
+.s1-hero .tag{margin-bottom:18px}
+.s1-hero .name{}
+.s1-hero .meta{}
+.s1-hero .bio{}
+.s1-empty{padding:24px 0;color:var(--ink-2);font-size:13px;font-style:italic;text-align:center}
+.s1-main{}
+/* === 顶部 sticky 分类导航(从用户数据动态生成) === */
+.s1-nav{
+  position:fixed;top:18px;right:24px;z-index:100;
+  display:flex;flex-direction:column;gap:4px;
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:10px 8px;
+  box-shadow:0 6px 24px rgba(0,0,0,.06);
+  max-width:180px;
+  font-family:var(--font-en);
+}
+.s1-nav-item{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:8px;padding:8px 12px;border-radius:8px;
+  font-size:12px;color:var(--ink-2);
+  text-decoration:none !important;border-bottom:none !important;
+  letter-spacing:.02em;
+  transition:all .15s ease;
+}
+.s1-nav-item:hover{background:var(--bg-2);color:var(--ink-0)}
+.s1-nav-item em{
+  font-style:normal;font-size:10px;
+  background:var(--bg-2);color:var(--ink-2);
+  padding:1px 7px;border-radius:99px;
+  min-width:18px;text-align:center;
+}
+.s1-nav-item.active{background:var(--brand);color:#fff;font-weight:600}
+.s1-nav-item.active em{background:rgba(255,255,255,.25);color:#fff}
+.s1-section{scroll-margin-top:80px}
+/* === Featured 标记项:大块、强调色边框、突出 === */
+.s1-item-star{
+  background:var(--brand-soft);
+  border-left:3px solid var(--brand);
+  padding:18px 18px 18px 20px !important;
+  margin:14px 0;
+  border-radius:0 8px 8px 0;
+}
+.s1-item-star .s1-title-star{font-size:19px;font-weight:700;color:var(--ink-0)}
+.s1-star-badge{
+  display:inline-block;
+  font-size:10px;letter-spacing:.1em;
+  color:var(--brand);background:#fff;
+  border:1px solid var(--brand);
+  padding:2px 8px;border-radius:99px;
+  margin-right:10px;
+  font-weight:600;vertical-align:middle;
+  font-family:var(--font-en);
+}
+.s1-item-star .s1-detail{font-size:15px;color:var(--ink-0);font-weight:500;line-height:1.8}
+
+/* === KPI 数字块(hero 下方) === */
+.s1-kpis{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(72px,1fr));
+  gap:0;margin:28px 0 0;padding:18px 0;
+  border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2);
+}
+.s1-kpi{text-align:center;padding:6px 4px;border-right:1px solid var(--line-2)}
+.s1-kpi:last-child{border-right:none}
+.s1-kpi-n{font-size:26px;font-weight:700;color:var(--brand);font-family:var(--font-en);letter-spacing:-.02em;line-height:1.1}
+.s1-kpi-l{font-size:11px;color:var(--ink-2);margin-top:4px;letter-spacing:.05em}
+
+/* === 关于我(段落) === */
+.s1-about p{font-size:16px;line-height:1.85;color:var(--ink-1);margin:8px 0}
+.s1-about p:first-child{font-size:18px;color:var(--ink-0);font-weight:500}
+
+/* === 技能标签云 === */
+.s1-skillcloud{display:flex;flex-wrap:wrap;gap:8px}
+.s1-skill{
+  font-size:13px;padding:6px 12px;
+  border:1px solid var(--line);border-radius:99px;
+  color:var(--ink-1);background:var(--bg-2);
+  font-family:var(--font-en);letter-spacing:.02em;
+  transition:all .15s ease;cursor:default;
+}
+.s1-skill:hover{border-color:var(--brand);color:var(--brand);background:#fff;transform:translateY(-1px)}
+
+/* === 详情展开(点击展开) === */
+.s1-item .s1-detail{font-size:14px;line-height:1.85;color:var(--ink-1);margin-top:10px;padding:10px 0 0;border-top:1px dashed var(--line-2)}
+
+/* === Footer 联系方式区 === */
+.s1-foot{
+  margin-top:80px;padding:48px 0 32px;
+  border-top:1px solid var(--line);text-align:center;
+}
+.s1-foot-name{font-size:20px;font-weight:600;color:var(--ink-0);margin-bottom:8px;letter-spacing:-.01em}
+.s1-foot-contact{font-size:13px;color:var(--ink-2);margin-bottom:12px;font-family:var(--font-en)}
+.s1-foot-cr{font-size:11px;color:var(--ink-3);letter-spacing:.04em}
+@media (max-width: 559px){
+  .s1-kpis{grid-template-columns:repeat(3,1fr);gap:0}
+  .s1-kpi{border-bottom:1px solid var(--line-2)}
+  .s1-kpi:nth-child(3n){border-right:none}
+  .s1-kpi:nth-last-child(-n+3){border-bottom:none}
+  .s1-kpi-n{font-size:22px}
+}
+
+:root{
+  --bg:#f5efe6;--bg-2:#ede4d4;
+  --ink-0:#2b1d12;--ink-1:#5c4a3a;--ink-2:#998775;--ink-3:#c4b6a2;
+  --line:rgba(43,29,18,.14);--line-2:rgba(43,29,18,.06);
+  --brand:#2f5d3a;--brand-soft:rgba(47,93,58,.10);
+  --font-cn:"Source Han Serif SC","Noto Serif CJK SC","Songti SC","SimSun",Georgia,serif;
+  --font-en:Georgia,"Playfair Display","Times New Roman",serif;
+}
+body{font:16px/1.9 var(--font-cn);color:var(--ink-0);background:var(--bg);font-feature-settings:"kern","liga"}
+::selection{background:var(--brand);color:#f5efe6}
+a{color:var(--brand);text-decoration:none;border-bottom:1px solid var(--brand)}
+.s1-name{font-family:var(--font-en);font-size:36px;font-weight:400;letter-spacing:-.01em;font-style:italic}
+.s1-meta{font-size:13px;color:var(--ink-2);font-family:var(--font-en);letter-spacing:.04em;margin-top:6px}
+.s1-bio{font-size:17px;line-height:1.85;margin-top:24px;padding-top:24px;border-top:1px dashed rgba(43,29,18,.18);color:var(--ink-1);font-style:italic}
+.s1-tag{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--brand);font-weight:500;font-family:var(--font-en)}
+.s1-section{margin-top:64px;padding-top:32px;border-top:2px solid var(--ink-0)}
+.s1-h{font-family:var(--font-en);font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-0);margin-bottom:28px;display:flex;align-items:baseline;gap:14px}
+.s1-h::before{content:"";width:24px;height:1px;background:var(--ink-0)}
+.s1-h em{color:var(--brand);font-style:italic;font-weight:400;letter-spacing:0;text-transform:none}
+.s1-item{padding:20px 0;border-bottom:1px dashed rgba(43,29,18,.14)}
+.s1-item:last-child{border-bottom:none}
+.s1-row{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.s1-title{font-size:17px;font-weight:600;line-height:1.45;flex:1;min-width:0}
+.s1-star{color:var(--brand);font-size:11px;margin-left:6px;font-weight:500}
+.s1-date{font-size:12px;color:var(--ink-2);font-family:var(--font-en);font-style:italic}
+.s1-cat{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);font-family:var(--font-en)}
+.s1-detail{font-size:14.5px;color:var(--ink-1);line-height:1.8;margin-top:8px}
+.s1-tags{margin-top:8px;font-size:12px;color:var(--ink-2);font-family:var(--font-en);font-style:italic}
+.s1-tags span{margin-right:10px}
+.s1-tags span::before{content:"·";color:var(--brand);margin-right:4px}
+.s1-cta{font-family:var(--font-en);font-style:italic;font-size:13px}
+.s1-foot{margin-top:80px;padding-top:24px;border-top:1px dashed rgba(43,29,18,.18);font-size:11px;color:var(--ink-2);text-align:center;letter-spacing:.16em;text-transform:uppercase;font-family:var(--font-en)}
+
+</style></head><body>
+<nav class="s1-nav" id="s1Nav"><a href="#s1-sec-about" class="s1-nav-item" data-target="s1-sec-about">关于我 <em>3</em></a><a href="#s1-sec-star" class="s1-nav-item" data-target="s1-sec-star">精选项目 <em>2</em></a><a href="#s1-sec-practice" class="s1-nav-item" data-target="s1-sec-practice">实践经历 <em>2</em></a><a href="#s1-sec-contest" class="s1-nav-item" data-target="s1-sec-contest">竞赛 <em>2</em></a><a href="#s1-sec-course" class="s1-nav-item" data-target="s1-sec-course">课程项目 <em>1</em></a><a href="#s1-sec-cert" class="s1-nav-item" data-target="s1-sec-cert">证书 <em>1</em></a><a href="#s1-sec-skills" class="s1-nav-item" data-target="s1-sec-skills">技能栈 <em>15</em></a><a href="#s1-sec-courses" class="s1-nav-item" data-target="s1-sec-courses">核心课程 <em>5</em></a></nav>
+<main class="s1-main">
+
+<section class="s1-hero" id="s1-sec-hero">
+  <div class="s1-tag">产品工程师</div>
+  <h1 class="s1-name">李华</h1>
+  <div class="s1-meta">清华大学 · 计算机 · lihua@tsinghua.edu.cn</div>
+  <div class="s1-bio"><p>喜欢做能落地的产品,关注 AI 应用与体验设计。</p><p>大二开始做产品经理实习,目前已积累 3 段实习经历。</p><p>擅长把 AI 模型能力包装成用户能直接感知的交互。</p></div>
+</section>
+<div class="s1-kpis"><div class="s1-kpi"><div class="s1-kpi-n">2</div><div class="s1-kpi-l">精选</div></div><div class="s1-kpi"><div class="s1-kpi-n">5</div><div class="s1-kpi-l">项目</div></div><div class="s1-kpi"><div class="s1-kpi-n">2</div><div class="s1-kpi-l">竞赛</div></div><div class="s1-kpi"><div class="s1-kpi-n">2</div><div class="s1-kpi-l">实习</div></div><div class="s1-kpi"><div class="s1-kpi-n">1</div><div class="s1-kpi-l">证书</div></div><div class="s1-kpi"><div class="s1-kpi-n">5</div><div class="s1-kpi-l">课程</div></div></div>
+<section class="s1-section" id="s1-sec-about" data-key="about">
+        <h2 class="s1-h">关于我</h2>
+        <div class="s1-about"><p>喜欢做能落地的产品,关注 AI 应用与体验设计。</p><p>大二开始做产品经理实习,目前已积累 3 段实习经历。</p><p>擅长把 AI 模型能力包装成用户能直接感知的交互。</p></div>
+      </section><section class="s1-section" id="s1-sec-star" data-key="star">
+      <h2 class="s1-h">精选项目 <em>2 项</em></h2>
+      <div class="s1-item s1-item-star">
+    <div class="s1-row">
+      <div class="s1-title s1-title-star"><span class="s1-star-badge">★ FEATURED</span>全国大学生电子设计竞赛一等奖</div>
+      <div class="s1-date">2025-06</div>
+      <div class="s1-cat">◆ 科创竞赛</div>
+    </div>
+    <div class="s1-detail">独立完成硬件设计、嵌入式软件与算法调优,获全国一等奖。</div>
+    <div class="s1-tags"><span>STM32</span><span>嵌入式</span><span>PID</span></div>
+  </div><div class="s1-item s1-item-star">
+    <div class="s1-row">
+      <div class="s1-title s1-title-star"><span class="s1-star-badge">★ FEATURED</span>腾讯微信支付前端实习</div>
+      <div class="s1-date">2024-08</div>
+      <div class="s1-cat">◉ 实践履历</div>
+    </div>
+    <div class="s1-detail">商户收银台 H5 重构,首屏加载提速 38%,月活流失下降 12%。</div>
+    <div class="s1-tags"><span>React</span><span>TypeScript</span><span>性能优化</span></div>
+  </div>
+    </section><section class="s1-section" id="s1-sec-practice" data-key="practice">
+      <h2 class="s1-h">实践经历 <em>2 项</em></h2>
+      <div class="s1-item s1-item-star">
+    <div class="s1-row">
+      <div class="s1-title s1-title-star"><span class="s1-star-badge">★ FEATURED</span>腾讯微信支付前端实习</div>
+      <div class="s1-date">2024-08</div>
+      <div class="s1-cat">◉ 实践履历</div>
+    </div>
+    <div class="s1-detail">商户收银台 H5 重构,首屏加载提速 38%,月活流失下降 12%。</div>
+    <div class="s1-tags"><span>React</span><span>TypeScript</span><span>性能优化</span></div>
+  </div><div class="s1-item">
+    <div class="s1-row">
+      <div class="s1-title">字节跳动产品实习</div>
+      <div class="s1-date">2024-03</div>
+      <div class="s1-cat">◉ 实践履历</div>
+    </div>
+    <div class="s1-detail">调研 3 个细分场景,产出 PRD 1 份,被采纳进入需求池。</div>
+    <div class="s1-tags"><span>产品</span><span>调研</span><span>PRD</span></div>
+  </div>
+    </section><section class="s1-section" id="s1-sec-contest" data-key="contest">
+      <h2 class="s1-h">竞赛 <em>2 项</em></h2>
+      <div class="s1-item s1-item-star">
+    <div class="s1-row">
+      <div class="s1-title s1-title-star"><span class="s1-star-badge">★ FEATURED</span>全国大学生电子设计竞赛一等奖</div>
+      <div class="s1-date">2025-06</div>
+      <div class="s1-cat">◆ 科创竞赛</div>
+    </div>
+    <div class="s1-detail">独立完成硬件设计、嵌入式软件与算法调优,获全国一等奖。</div>
+    <div class="s1-tags"><span>STM32</span><span>嵌入式</span><span>PID</span></div>
+  </div><div class="s1-item">
+    <div class="s1-row">
+      <div class="s1-title">数学建模美赛 M 奖</div>
+      <div class="s1-date">2024-04</div>
+      <div class="s1-cat">◆ 科创竞赛</div>
+    </div>
+    <div class="s1-detail">数据挖掘与机器学习建模,全英文论文,获 Meritorious Winner。</div>
+    <div class="s1-tags"><span>MATLAB</span><span>统计</span></div>
+  </div>
+    </section><section class="s1-section" id="s1-sec-course" data-key="course">
+      <h2 class="s1-h">课程项目 <em>1 项</em></h2>
+      <div class="s1-item">
+    <div class="s1-row">
+      <div class="s1-title">机器学习课程项目 - 图像风格迁移</div>
+      <div class="s1-date">2024-12</div>
+      <div class="s1-cat">◧ 课程项目</div>
+    </div>
+    <div class="s1-detail">PyTorch 实现 AdaIN 与 CycleGAN,Web 端 Demo 获 A+。</div>
+    <div class="s1-tags"><span>PyTorch</span><span>CNN</span><span>Web</span></div>
+  </div>
+    </section><section class="s1-section" id="s1-sec-cert" data-key="cert">
+      <h2 class="s1-h">证书 <em>1 项</em></h2>
+      <div class="s1-item">
+    <div class="s1-row">
+      <div class="s1-title">大学英语六级 580 分</div>
+      <div class="s1-date">2024-06</div>
+      <div class="s1-cat">▣ 证书技能</div>
+    </div>
+    
+    <div class="s1-tags"><span>英语</span></div>
+  </div>
+    </section><section class="s1-section" id="s1-sec-skills" data-key="skills">
+        <h2 class="s1-h">技能栈 <em>15 项</em></h2>
+        <div class="s1-skillcloud"><span class="s1-skill">STM32</span><span class="s1-skill">嵌入式</span><span class="s1-skill">PID</span><span class="s1-skill">React</span><span class="s1-skill">TypeScript</span><span class="s1-skill">性能优化</span><span class="s1-skill">产品</span><span class="s1-skill">调研</span><span class="s1-skill">PRD</span><span class="s1-skill">MATLAB</span><span class="s1-skill">统计</span><span class="s1-skill">PyTorch</span><span class="s1-skill">CNN</span><span class="s1-skill">Web</span><span class="s1-skill">英语</span></div>
+      </section><section class="s1-section" id="s1-sec-courses" data-key="courses">
+      <h2 class="s1-h">核心课程 <em>5 项</em></h2>
+      <div class="s1-item">
+    <div class="s1-row">
+      <div class="s1-title">机器学习</div>
+      
+      <div class="s1-cat">◧ 课程项目</div>
+    </div>
+    
+    
+  </div><div class="s1-item">
+    <div class="s1-row">
+      <div class="s1-title">人机交互</div>
+      
+      <div class="s1-cat">◧ 课程项目</div>
+    </div>
+    
+    
+  </div><div class="s1-item">
+    <div class="s1-row">
+      <div class="s1-title">数据库</div>
+      
+      <div class="s1-cat">◧ 课程项目</div>
+    </div>
+    
+    
+  </div><div class="s1-item">
+    <div class="s1-row">
+      <div class="s1-title">前端工程</div>
+      
+      <div class="s1-cat">◧ 课程项目</div>
+    </div>
+    
+    
+  </div><div class="s1-item">
+    <div class="s1-row">
+      <div class="s1-title">产品设计</div>
+      
+      <div class="s1-cat">◧ 课程项目</div>
+    </div>
+    
+    
+  </div>
+    </section>
+</main>
+<footer class="s1-foot">
+  <div class="s1-foot-name">李华</div>
+  <div class="s1-foot-contact">lihua@tsinghua.edu.cn · 13800000000</div>
+  <div class="s1-foot-cr">© 2026 · 由 Portfolio Studio 生成</div>
+</footer>
+<script>
+(function(){
+  // 1. 点击导航 → 平滑滚动 + 同步高亮
+  var nav = document.getElementById('s1Nav');
+  if (nav) {
+    nav.addEventListener('click', function(e){
+      var a = e.target.closest('a.s1-nav-item');
+      if (!a) return;
+      e.preventDefault();
+      var t = document.getElementById(a.getAttribute('data-target'));
+      if (t) {
+        var top = t.getBoundingClientRect().top + window.pageYOffset - 70;
+        window.scrollTo({top: top, behavior: 'smooth'});
+        setActive(a.getAttribute('data-target'));
+      }
+    });
+  }
+  function setActive(id){
+    if (!nav) return;
+    nav.querySelectorAll('a.s1-nav-item').forEach(function(x){
+      x.classList.toggle('active', x.getAttribute('data-target') === id);
+    });
+  }
+  // 2. 滚动时自动高亮当前 section
+  var secIds = (nav ? Array.from(nav.querySelectorAll('a.s1-nav-item')).map(function(a){return a.getAttribute('data-target');}) : []);
+  var ticking = false;
+  function onScroll(){
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function(){
+      ticking = false;
+      var y = window.pageYOffset + 120;
+      var cur = secIds[0];
+      for (var i=0;i<secIds.length;i++){
+        var el = document.getElementById(secIds[i]);
+        if (el && el.getBoundingClientRect().top + window.pageYOffset <= y) cur = secIds[i];
+      }
+      setActive(cur);
+    });
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  // 初始高亮
+  setTimeout(function(){ onScroll(); }, 50);
+})();
+</script>
+</body></html>
