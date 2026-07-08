@@ -1304,20 +1304,27 @@ function doPublish(tpl) {
   // 第二步:尝试本地 publish_server(开发者本机模式,直接拿到公网链接)
   const useLocal = /localhost|127\.0\.0\.1/i.test(location.hostname);
   if (useLocal) {
+    // 2 秒超时,避免在公网模式下卡死
+    const ctl = new AbortController();
+    const tid = setTimeout(() => ctl.abort(), 2000);
     fetch("http://127.0.0.1:9876/publish", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ html, name: profile.pName || "portfolio", tpl })
+      body: JSON.stringify({ html, name: profile.pName || "portfolio", tpl }),
+      signal: ctl.signal
     })
     .then(r => r.json().then(j => ({ status: r.status, body: j })))
     .then(({ status, body }) => {
+      clearTimeout(tid);
       if (status !== 200 || !body.ok) throw new Error(body && body.message ? body.message : ("HTTP " + status));
       const url = body.publicUrl;
       showPublishSuccessDialog(url, body.filename || fname, body.size || html.length, html, tpl);
     })
     .catch(err => {
+      clearTimeout(tid);
       // 本地模式失败也回退到下载
-      showPublishDownloadDialog(html, fname, err.message);
+      const reason = err && err.name === "AbortError" ? "本地通道 2 秒内未响应(公网用户请用下载模式)" : err.message;
+      showPublishDownloadDialog(html, fname, reason);
     });
   } else {
     // 公网用户模式:直接下载 HTML + 引导用户部署
